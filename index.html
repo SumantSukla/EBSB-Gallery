@@ -21,6 +21,22 @@
         font-display: swap;
     }
 
+    @font-face {
+        font-family: 'Gotu';
+        src: url('assets/Gotu-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'Potti Sreeramulu';
+        src: url('assets/potti-sreeramulu-regular.otf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -107,10 +123,10 @@
     }
 
     .title-card .title {
-      font-family: 'Reality Stone', sans-serif;
-      font-size: 6rem;
+      position: absolute;
       text-align: center;
       color: #FDB515;
+      transition: 1s ease-in-out;
       text-shadow: 
         1px 1px 0px #d35400,
         2px 2px 0px #d35400,
@@ -120,6 +136,25 @@
         10px 15px 20px rgba(0, 0, 0, 0.81),
         10px 15px 20px rgba(0, 0, 0, 0.81),
         10px 15px 20px rgba(0, 0, 0, 0.81);
+    }
+
+    .hidden {
+      opacity: 0;
+    }
+
+    .eng {
+      font-family: 'Reality Stone', sans-serif;
+      font-size: 6rem;
+    }
+
+    .hindi {
+      font-family: 'Gotu', sans-serif;
+      font-size: 9rem;
+    }
+
+    .telugu {
+      font-family: 'Potti Sreeramulu', sans-serif;
+      font-size: 10rem;
     }
 
     .cream-card {
@@ -253,7 +288,9 @@
 
     <!-- Title Card Overlay -->
     <div id="title-card" class="title-card">
-        <div class="title">Ek Bharat Shreshtha Bharat</div>
+        <div class="title eng" id="eng">Ek Bharat Shreshtha Bharat</div>
+        <div class="title hindi hidden" id="hindi">एक भारत श्रेस्ठ भारत</div>
+        <div class="title telugu hidden" id="telugu">ఏక భారతం, గొప్ప భారతం</div>
     </div>
     
     <!-- Horizontal Gallery -->
@@ -265,8 +302,8 @@
         <image id="imageH4" src="assets/imageH4.jpg" class = "img-card hidden-left"></image>
         <image src="assets/bg.webp" class="bg-loader" style = "opacity:0.2; z-index: -1;"></image>
 
-        <button class="arrow aleft" onclick="scroll_left()"></button>
-        <button class="arrow aright" onclick="scroll_right()"></button>
+        <button class="arrow aleft" onclick="scroll_right()"></button>
+        <button class="arrow aright" onclick="scroll_left()"></button>
     </div>
 
   </main>
@@ -346,6 +383,34 @@
         title_card.style.transform = `translateY(${moveAmount}px)`;
         cream_card.style.transform = `translateY(${moveAmount}px)`;
     });
+
+
+    // language change
+    let num = 1
+    setInterval(() => {
+        const engTitle = document.getElementById('eng');
+        const hindiTitle = document.getElementById('hindi');
+        const teluguTitle = document.getElementById('telugu');
+
+        if (num == 1) 
+        {
+            engTitle.classList.remove('hidden');
+            teluguTitle.classList.add('hidden');
+            num = 2;
+        } 
+        else if (num == 2) 
+        {
+            hindiTitle.classList.remove('hidden');
+            engTitle.classList.add('hidden');
+            num = 3;
+        } 
+        else if (num == 3) 
+        {
+            hindiTitle.classList.add('hidden');
+            teluguTitle.classList.remove('hidden');
+            num = 1;
+        }
+    }, 3000); // Change every 3 seconds
 
 
     // For the second gallery, we will move the images left and right in a loop
