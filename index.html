@@ -41,18 +41,16 @@
       transition: opacity 1.5s ease-in, visibility 1.5s ease-in;
     }
 
-    .spinner1 {
+    .spinner1 { /* inner spinner */
         width: 200px;
         height: 200px;
-        /* Smooth CSS rotation */
         animation: spin 3s linear infinite;
         position: absolute;
     }
 
-    .spinner2 {
+    .spinner2 { /* outer spinner */
         width: 380px;
         height: 380px;
-        /* Smooth CSS rotation */
         animation: spin 3s linear infinite reverse;
         position: absolute;
     }
@@ -68,13 +66,11 @@
         to { transform: rotate(360deg); }
     }
 
-    /* Class added via JS to hide loader */
     #loader-wrapper.loader-hidden {
       opacity: 0;
       visibility: hidden;
     }
 
-    /* Main Content Entrance Animation */
     .content {
       opacity: 0;
       transition: opacity 1s ease-in,;
@@ -272,18 +268,21 @@
   </main>
 
   <script>
+
+    // loader code
     window.addEventListener('load', () => {
         setTimeout(() => {
             const loader = document.getElementById('loader-wrapper');
             loader.classList.add('loader-hidden');
             document.body.classList.add('loaded');
             window.scrollTo(0, 0);
-        }, 2000)
+        }, 2000) // i set a timeout of 2 seconds so that you can appreciate the loader animation
     });
 
     images = [[],[],[],[],[]]
     h_images = []
 
+    // Store image divs in variables
     for (let i = 0; i < 5; i++) 
     {
         for (let j = 0; j < 6; j++) 
@@ -298,7 +297,7 @@
     }
 
 
-
+    // for the first gallery, we will move the images upwards and downwards in a loop
     const speed = 0.1;
 
     setInterval(() => {
@@ -345,6 +344,7 @@
     });
 
 
+    // For the second gallery, we will move the images left and right in a loop
 
     function scroll_left() {
         for (let i = 0; i < 5; i++) {
@@ -405,6 +405,8 @@
 
         }
     }
+
+    // voila!
 
   </script>
 </body>
