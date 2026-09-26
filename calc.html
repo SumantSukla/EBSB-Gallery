@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>
+      Chalkboard Physicist - Hand-Drawn Scientific & Graphing Calculator
+    </title>
+
+    <!-- Math.js library for calculus parsing & math processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+
+    <!-- Google Fonts: Rough Hand-Drawn Chalk Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Caveat:wght@600;700&family=Fira+Code:wght@400;600&family=Fredericka+the+Great&family=Kalam:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./stylesheet.css" />
+  </head>
+  <body>
+    <!-- SVG Noise Filter for Blackboard Slate Texture -->
+    <svg class="bg-noise">
+      <filter id="noiseFilter">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.8"
+          numOctaves="3"
+          stitchTiles="stitch"
+        />
+        <feColorMatrix
+          type="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.15 0"
+        />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+    </svg>
+
+    <!-- Particle Dust Layer -->
+    <canvas id="dustCanvas"></canvas>
+
+    <!-- Main Wooden Blackboard Container -->
+    <div class="chalkboard-container">
+      <!-- Header -->
+      <header>
+        <div class="app-title">✏️ Chalkboard Physicist <span>v2.0</span></div>
+
+        <!-- Navigation Tabs -->
+        <div class="tab-controls">
+          <button
+            class="tab-btn active"
+            id="tabBtnCalc"
+            onclick="switchTab('calc')"
+          >
+            🧮 Scientific Calc
+          </button>
+          <button class="tab-btn" id="tabBtnGraph" onclick="switchTab('graph')">
+            📈 Graphing Slate
+          </button>
+        </div>
+
+        <!-- Sound Toggle -->
+        <div>
+          <button
+            class="top-utility-btn"
+            id="soundToggle"
+            onclick="toggleAudio()"
+          >
+            🔊 Sound: ON
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: SCIENTIFIC CALCULATOR VIEW -->
+      <div id="calcView" class="tab-view active">
+        <div class="calc-layout">
+          <!-- Keypad & Display Box -->
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <!-- Screen Display Slate -->
+            <div class="display-slate" id="calcDisplay">
+              <!-- Felt Eraser Wipe Animation -->
+              <div class="felt-eraser" id="feltEraser"></div>
+
+              <div class="mode-indicators">
+                <span id="angleModeDisplay">DEG</span>
+              </div>
+              <div class="expression-line" id="expressionText"></div>
+              <div class="result-line" id="resultText">0</div>
+            </div>
+
+            <!-- Hand-Drawn Keypad -->
+            <!-- Function keys: editing, trig, powers/roots/constants -->
+            <div class="keypad keypad-functions">
+              <!-- editing & mode controls -->
+              <button class="btn btn-op" onclick="appendToken('(')">(</button>
+              <button class="btn btn-op" onclick="appendToken(')')">)</button>
+              <button
+                class="btn btn-fn"
+                onclick="toggleAngleMode()"
+                id="degRadBtn"
+              >
+                DEG
+              </button>
+              <button class="btn btn-clear" onclick="deleteLast()">DEL</button>
+              <button class="btn btn-clear" onclick="triggerEraserClear()">
+                AC
+              </button>
+
+              <!-- trig -->
+              <button class="btn btn-fn" onclick="appendFunc('sin(')">
+                sin
+              </button>
+              <button class="btn btn-fn" onclick="appendFunc('cos(')">
+                cos
+              </button>
+              <button class="btn btn-fn" onclick="appendFunc('tan(')">
+                tan
+              </button>
+              <button class="btn btn-fn" onclick="appendFunc('asin(')">
+                asin
+              </button>
+              <button class="btn btn-fn" onclick="appendFunc('acos(')">
+                acos
+              </button>
+
+              <!-- more trig + logs -->
+              <button class="btn btn-fn" onclick="appendFunc('atan(')">
+                atan
+              </button>
+              <button class="btn btn-fn" onclick="appendFunc('log10(')">
+                log
+              </button>
+              <button class="btn btn-fn" onclick="appendFunc('log(')">
+                ln
+              </button>
+              <button class="btn btn-fn" onclick="appendFunc('sqrt(')">
+                √
+              </button>
+              <button class="btn btn-fn" onclick="appendToken('^')">xʸ</button>
+
+              <!-- powers & constants -->
+              <button class="btn btn-fn" onclick="appendToken('^2')">x²</button>
+              <button class="btn btn-fn" onclick="appendToken('!')">n!</button>
+              <button class="btn btn-fn" onclick="appendToken('pi')">π</button>
+              <button class="btn btn-fn" onclick="appendToken('e')">e</button>
+            </div>
+
+            <!-- Calculus tools: full-width row, visually set apart -->
+            <div class="calc-tools">
+              <button
+                class="btn btn-calc"
+                title="Derivative at point x: d/dx"
+                onclick="promptDerivative()"
+              >
+                d/dx
+              </button>
+              <button
+                class="btn btn-calc"
+                title="Definite Integral: ∫"
+                onclick="promptIntegral()"
+              >
+                ∫
+              </button>
+            </div>
+
+            <!-- Standard numeric pad: digits are boxed together as their own
+                 unit, operators sit in a separate strip beside them -->
+            <div class="numeric-block">
+              <div class="num-grid">
+                <button class="btn btn-num" onclick="appendToken('7')">7</button>
+                <button class="btn btn-num" onclick="appendToken('8')">8</button>
+                <button class="btn btn-num" onclick="appendToken('9')">9</button>
+
+                <button class="btn btn-num" onclick="appendToken('4')">4</button>
+                <button class="btn btn-num" onclick="appendToken('5')">5</button>
+                <button class="btn btn-num" onclick="appendToken('6')">6</button>
+
+                <button class="btn btn-num" onclick="appendToken('1')">1</button>
+                <button class="btn btn-num" onclick="appendToken('2')">2</button>
+                <button class="btn btn-num" onclick="appendToken('3')">3</button>
+
+                <button class="btn btn-num btn-zero" onclick="appendToken('0')">0</button>
+                <button class="btn btn-num" onclick="appendToken('.')">.</button>
+              </div>
+              <div class="op-grid">
+                <button class="btn btn-op" onclick="appendToken('/')">÷</button>
+                <button class="btn btn-op" onclick="appendToken('*')">×</button>
+                <button class="btn btn-op" onclick="appendToken('-')">−</button>
+                <button class="btn btn-op" onclick="appendToken('+')">+</button>
+              </div>
+            </div>
+            <button class="btn btn-equals btn-equals-bar" onclick="calculateResult()">
+              =
+            </button>
+          </div>
+
+          <!-- History Log Slate -->
+          <div class="history-slate">
+            <div class="history-header">
+              <span>📜 Calculation Log</span>
+              <button
+                class="top-utility-btn"
+                onclick="clearHistory()"
+                style="padding: 2px 8px; font-size: 0.85rem"
+              >
+                Clear
+              </button>
+            </div>
+            <div class="history-list" id="historyList">
+              <div
+                style="
+                  font-size: 1rem;
+                  color: rgba(255, 255, 255, 0.4);
+                  text-align: center;
+                  margin-top: 20px;
+                "
+              >
+                No calculations yet.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: GRAPHING CALCULATOR VIEW -->
+      <div id="graphView" class="tab-view">
+        <div class="graphing-wrapper">
+          <!-- Controls Panel -->
+          <div class="graph-controls-panel">
+            <div class="input-group">
+              <label style="color: var(--chalk-yellow)"
+                >f(x) Main Function:</label
+              >
+              <input
+                type="text"
+                id="funcInputF"
+                class="chalk-input"
+                value="sin(x) * x"
+                placeholder="e.g. sin(x)"
+              />
+            </div>
+
+            <div class="input-group">
+              <label style="color: var(--chalk-pink)"
+                >g(x) Second Function:</label
+              >
+              <input
+                type="text"
+                id="funcInputG"
+                class="chalk-input"
+                value="cos(x)"
+                placeholder="e.g. cos(x)"
+              />
+            </div>
+
+            <hr
+              style="
+                border: none;
+                border-top: 2px dashed rgba(255, 255, 255, 0.2);
+              "
+            />
+
+            <div class="checkbox-group">
+              <input
+                type="checkbox"
+                id="showDerivCheck"
+                onchange="renderGraph()"
+              />
+              <label for="showDerivCheck" style="color: var(--chalk-cyan)"
+                >Show Derivative f'(x)</label
+              >
+            </div>
+
+            <div class="checkbox-group">
+              <input
+                type="checkbox"
+                id="showIntegralCheck"
+                onchange="renderGraph()"
+              />
+              <label for="showIntegralCheck" style="color: var(--chalk-green)"
+                >Shade Integral Area</label
+              >
+            </div>
+
+            <div class="input-group" style="margin-top: 4px">
+              <label style="font-size: 0.95rem; color: rgba(255, 255, 255, 0.7)"
+                >Limits [a, b]:</label
+              >
+              <div style="display: flex; gap: 8px">
+                <input
+                  type="number"
+                  id="intLimitA"
+                  class="chalk-input"
+                  value="-2"
+                  style="width: 50%"
+                  onchange="renderGraph()"
+                />
+                <input
+                  type="number"
+                  id="intLimitB"
+                  class="chalk-input"
+                  value="2"
+                  style="width: 50%"
+                  onchange="renderGraph()"
+                />
+              </div>
+            </div>
+
+            <hr
+              style="
+                border: none;
+                border-top: 2px dashed rgba(255, 255, 255, 0.2);
+              "
+            />
+
+            <label style="font-size: 1.05rem; color: var(--chalk-white)"
+              >Preset Curve Library:</label
+            >
+            <div class="preset-btn-grid">
+              <button class="preset-btn" onclick="loadPreset('sine')">
+                Sine Wave
+              </button>
+              <button class="preset-btn" onclick="loadPreset('cubic')">
+                Cubic Poly
+              </button>
+              <button class="preset-btn" onclick="loadPreset('gauss')">
+                Gaussian
+              </button>
+              <button class="preset-btn" onclick="loadPreset('damped')">
+                Damped Osc
+              </button>
+            </div>
+
+            <button
+              class="btn btn-equals"
+              onclick="renderGraph()"
+              style="
+                margin-top: 8px;
+                font-size: 1.3rem;
+                padding: 8px;
+                transform: rotate(-0.5deg);
+              "
+            >
+              ✏️ Plot Functions
+            </button>
+          </div>
+
+          <!-- Graph Canvas Slate -->
+          <div class="graph-viewport" id="graphViewport">
+            <canvas id="graphCanvas"></canvas>
+            <div class="graph-overlay-info" id="graphCoords">
+              X: 0.00 | Y: 0.00 (Scroll to zoom, Drag to pan)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ====================================================================
+       GLOBAL STATE & SYNTHESIZED PROCEDURAL CHALK AUDIO
+       ==================================================================== */
+      let currentTab = "calc";
+      let angleMode = "DEG";
+      let currentExpression = "";
+      let soundEnabled = true;
+      let audioCtx = null;
+
+      // Procedural Web Audio API Chalk Scratch Sound Synthesizer
+      function playChalkSound(type = "click") {
+        if (!soundEnabled) return;
+        try {
+          if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioCtx.state === "suspended") {
+            audioCtx.resume();
+          }
+
+          const bufferSize =
+            audioCtx.sampleRate * (type === "wipe" ? 0.38 : 0.04);
+          const buffer = audioCtx.createBuffer(
+            1,
+            bufferSize,
+            audioCtx.sampleRate,
+          );
+          const output = buffer.getChannelData(0);
+
+          for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+          }
+
+          const whiteNoise = audioCtx.createBufferSource();
+          whiteNoise.buffer = buffer;
+
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = type === "wipe" ? "lowpass" : "bandpass";
+          filter.frequency.value = type === "wipe" ? 450 : 1900;
+          filter.Q.value = 2.5;
+
+          const gain = audioCtx.createGain();
+          gain.gain.setValueAtTime(
+            type === "wipe" ? 0.28 : 0.16,
+            audioCtx.currentTime,
+          );
+          gain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioCtx.currentTime + (type === "wipe" ? 0.35 : 0.035),
+          );
+
+          whiteNoise.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          whiteNoise.start();
+        } catch (e) {
+          // Audio fallback
+        }
+      }
+
+      function toggleAudio() {
+        soundEnabled = !soundEnabled;
+        document.getElementById("soundToggle").innerText = soundEnabled
+          ? "🔊 Sound: ON"
+          : "🔇 Sound: OFF";
+      }
+
+      function switchTab(tab) {
+        currentTab = tab;
+        playChalkSound("click");
+
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-view")
+          .forEach((v) => v.classList.remove("active"));
+
+        if (tab === "calc") {
+          document.getElementById("tabBtnCalc").classList.add("active");
+          document.getElementById("calcView").classList.add("active");
+        } else {
+          document.getElementById("tabBtnGraph").classList.add("active");
+          document.getElementById("graphView").classList.add("active");
+          setTimeout(initGraphCanvas, 50);
+        }
+      }
+
+      /* Chalk Dust Particles */
+      const dustCanvas = document.getElementById("dustCanvas");
+      const dustCtx = dustCanvas.getContext("2d");
+      let particles = [];
+
+      function resizeDustCanvas() {
+        dustCanvas.width = window.innerWidth;
+        dustCanvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resizeDustCanvas);
+      resizeDustCanvas();
+
+      class ChalkParticle {
+        constructor(x, y, color = "#ffffff") {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 3.5 + 1;
+          this.vx = (Math.random() - 0.5) * 3.5;
+          this.vy = (Math.random() - 0.5) * 3.5 - 1;
+          this.alpha = 1;
+          this.color = color;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= 0.025;
+        }
+        draw() {
+          dustCtx.save();
+          dustCtx.globalAlpha = Math.max(0, this.alpha);
+          dustCtx.fillStyle = this.color;
+          dustCtx.beginPath();
+          dustCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          dustCtx.fill();
+          dustCtx.restore();
+        }
+      }
+
+      function spawnDustBurst(x, y, count = 25, color = "#ffffff") {
+        for (let i = 0; i < count; i++) {
+          particles.push(new ChalkParticle(x, y, color));
+        }
+      }
+
+      function animateParticles() {
+        dustCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+        particles = particles.filter((p) => p.alpha > 0);
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      /* ====================================================================
+       SCIENTIFIC CALCULATOR ENGINE
+       ==================================================================== */
+      function toggleAngleMode() {
+        angleMode = angleMode === "DEG" ? "RAD" : "DEG";
+        document.getElementById("degRadBtn").innerText = angleMode;
+        document.getElementById("angleModeDisplay").innerText = angleMode;
+        playChalkSound("click");
+      }
+
+      function appendToken(token) {
+        playChalkSound("click");
+        currentExpression += token;
+        updateDisplay();
+      }
+
+      function appendFunc(funcStr) {
+        playChalkSound("click");
+        currentExpression += funcStr;
+        updateDisplay();
+      }
+
+      function deleteLast() {
+        playChalkSound("click");
+        currentExpression = currentExpression.slice(0, -1);
+        updateDisplay();
+      }
+
+      function updateDisplay() {
+        document.getElementById("expressionText").innerText = currentExpression;
+      }
+
+      function triggerEraserClear() {
+        playChalkSound("wipe");
+        const eraser = document.getElementById("feltEraser");
+        eraser.classList.remove("wiping");
+        void eraser.offsetWidth;
+        eraser.classList.add("wiping");
+
+        const displayRect = document
+          .getElementById("calcDisplay")
+          .getBoundingClientRect();
+        spawnDustBurst(
+          displayRect.left + displayRect.width / 2,
+          displayRect.top + displayRect.height / 2,
+          50,
+          "#e5e5e5",
+        );
+
+        setTimeout(() => {
+          currentExpression = "";
+          document.getElementById("expressionText").innerText = "";
+          document.getElementById("resultText").innerText = "0";
+        }, 300);
+      }
+
+      // Rewrites sin(/cos(/tan(/asin(/acos(/atan( calls for DEG mode.
+      // Walks the string tracking paren depth so it (a) never mistakes the
+      // "sin" inside "asin" for the plain sin() function, and (b) correctly
+      // matches the closing paren even when the argument itself contains
+      // nested parentheses, e.g. sin(2*(1+3)).
+      function convertTrigForDegrees(str) {
+        const fwd = ["sin", "cos", "tan"];
+        const inv = ["asin", "acos", "atan"];
+        const all = [...inv, ...fwd]; // check longer names (asin) before short (sin)
+        let out = "";
+        let i = 0;
+        while (i < str.length) {
+          let matchName = null;
+          for (const name of all) {
+            const prevChar = i > 0 ? str[i - 1] : "";
+            if (
+              str.startsWith(name + "(", i) &&
+              !/[A-Za-z]/.test(prevChar)
+            ) {
+              matchName = name;
+              break;
+            }
+          }
+          if (matchName) {
+            const argStart = i + matchName.length + 1;
+            let depth = 1;
+            let j = argStart;
+            while (j < str.length && depth > 0) {
+              if (str[j] === "(") depth++;
+              else if (str[j] === ")") depth--;
+              j++;
+            }
+            const rawArg = str.slice(argStart, j - 1);
+            const arg = convertTrigForDegrees(rawArg); // handle nested calls
+            if (fwd.includes(matchName)) {
+              out += `${matchName}((${arg})*deg)`;
+            } else {
+              out += `(${matchName}(${arg})/deg)`; // convert radians result to degrees
+            }
+            i = j;
+          } else {
+            out += str[i];
+            i++;
+          }
+        }
+        return out;
+      }
+
+      function calculateResult() {
+        if (!currentExpression.trim()) return;
+        playChalkSound("click");
+
+        try {
+          let exprToEval = currentExpression;
+
+          if (angleMode === "DEG") {
+            exprToEval = convertTrigForDegrees(exprToEval);
+          }
+
+          const compiled = math.compile(exprToEval);
+          const scope = { deg: Math.PI / 180 };
+          let res = compiled.evaluate(scope);
+
+          if (typeof res === "number") {
+            if (Math.abs(res) < 1e-12) res = 0;
+            if (!Number.isInteger(res)) res = parseFloat(res.toFixed(8));
+          }
+
+          document.getElementById("resultText").innerText = res;
+
+          const rect = document
+            .getElementById("calcDisplay")
+            .getBoundingClientRect();
+          spawnDustBurst(rect.right - 40, rect.bottom - 20, 30, "#fce893");
+
+          addHistoryItem(currentExpression, res);
+        } catch (err) {
+          document.getElementById("resultText").innerText = "Syntax Error";
+        }
+      }
+
+      function promptDerivative() {
+        const expr = prompt("Enter function f(x) for d/dx:", "x^3 + 2*x");
+        if (!expr) return;
+        const xValStr = prompt("Evaluate derivative at x =", "2");
+        if (xValStr === null) return;
+
+        try {
+          const xVal = parseFloat(xValStr);
+          const derivativeExpr = math.derivative(expr, "x").toString();
+          const compiled = math.compile(derivativeExpr);
+          const val = compiled.evaluate({ x: xVal });
+
+          currentExpression = `d/dx(${expr}) @ x=${xVal}`;
+          document.getElementById("expressionText").innerText =
+            currentExpression;
+          document.getElementById("resultText").innerText = parseFloat(
+            val.toFixed(6),
+          );
+          addHistoryItem(currentExpression, val);
+        } catch (err) {
+          alert("Error evaluating derivative: " + err.message);
+        }
+      }
+
+      function promptIntegral() {
+        const expr = prompt(
+          "Enter function f(x) for Definite Integral ∫:",
+          "x^2",
+        );
+        if (!expr) return;
+        const aStr = prompt("Lower limit a:", "0");
+        const bStr = prompt("Upper limit b:", "3");
+        if (aStr === null || bStr === null) return;
+
+        try {
+          const a = parseFloat(aStr);
+          const b = parseFloat(bStr);
+          const compiled = math.compile(expr);
+
+          const N = 200;
+          const h = (b - a) / N;
+          let sum = compiled.evaluate({ x: a }) + compiled.evaluate({ x: b });
+
+          for (let i = 1; i < N; i += 2) {
+            sum += 4 * compiled.evaluate({ x: a + i * h });
+          }
+          for (let i = 2; i < N - 1; i += 2) {
+            sum += 2 * compiled.evaluate({ x: a + i * h });
+          }
+          const area = (h / 3) * sum;
+
+          currentExpression = `∫(${expr}) dx [${a}, ${b}]`;
+          document.getElementById("expressionText").innerText =
+            currentExpression;
+          document.getElementById("resultText").innerText = parseFloat(
+            area.toFixed(6),
+          );
+          addHistoryItem(currentExpression, area);
+        } catch (err) {
+          alert("Error evaluating integral: " + err.message);
+        }
+      }
+
+      function addHistoryItem(expr, result) {
+        const list = document.getElementById("historyList");
+        if (
+          list.children[0] &&
+          list.children[0].innerText.includes("No calculations")
+        ) {
+          list.innerHTML = "";
+        }
+
+        const item = document.createElement("div");
+        item.className = "history-item";
+        item.onclick = () => {
+          currentExpression = expr;
+          updateDisplay();
+          switchTab("calc");
+        };
+
+        item.innerHTML = `
+        <div class="history-expr">${expr}</div>
+        <div class="history-res">= ${result}</div>
+      `;
+        list.prepend(item);
+      }
+
+      function clearHistory() {
+        document.getElementById("historyList").innerHTML = `
+        <div style="font-size: 1rem; color: rgba(255,255,255,0.4); text-align: center; margin-top: 20px;">
+          No calculations yet.
+        </div>
+      `;
+      }
+
+      /* ====================================================================
+       GRAPHING ENGINE
+       ==================================================================== */
+      let graphCanvas, graphCtx;
+      let viewX = 0,
+        viewY = 0;
+      let scale = 40;
+      let isDragging = false;
+      let dragStart = { x: 0, y: 0 };
+
+      function initGraphCanvas() {
+        graphCanvas = document.getElementById("graphCanvas");
+        const viewport = document.getElementById("graphViewport");
+        graphCanvas.width = viewport.clientWidth;
+        graphCanvas.height = viewport.clientHeight;
+        graphCtx = graphCanvas.getContext("2d");
+
+        graphCanvas.onmousedown = (e) => {
+          isDragging = true;
+          dragStart = { x: e.clientX, y: e.clientY };
+        };
+
+        window.onmousemove = (e) => {
+          if (isDragging) {
+            const dx = e.clientX - dragStart.x;
+            const dy = e.clientY - dragStart.y;
+            viewX += dx / scale;
+            viewY -= dy / scale;
+            dragStart = { x: e.clientX, y: e.clientY };
+            renderGraph();
+          }
+
+          if (graphCanvas) {
+            const rect = graphCanvas.getBoundingClientRect();
+            if (
+              e.clientX >= rect.left &&
+              e.clientX <= rect.right &&
+              e.clientY >= rect.top &&
+              e.clientY <= rect.bottom
+            ) {
+              const mouseX = e.clientX - rect.left;
+              const mouseY = e.clientY - rect.top;
+              const mathX = (mouseX - graphCanvas.width / 2) / scale - viewX;
+              const mathY = -(mouseY - graphCanvas.height / 2) / scale - viewY;
+              document.getElementById("graphCoords").innerText =
+                `X: ${mathX.toFixed(2)} | Y: ${mathY.toFixed(2)}`;
+            }
+          }
+        };
+
+        window.onmouseup = () => {
+          isDragging = false;
+        };
+
+        graphCanvas.onwheel = (e) => {
+          e.preventDefault();
+          const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+          scale *= zoomFactor;
+          scale = Math.max(10, Math.min(scale, 300));
+          renderGraph();
+        };
+
+        renderGraph();
+      }
+
+      function renderGraph() {
+        if (!graphCtx) return;
+
+        const width = graphCanvas.width;
+        const height = graphCanvas.height;
+        const centerX = width / 2 + viewX * scale;
+        const centerY = height / 2 - viewY * scale;
+
+        graphCtx.clearRect(0, 0, width, height);
+
+        // Chalk Grid Lines
+        graphCtx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        graphCtx.lineWidth = 1;
+        const gridSize = scale;
+
+        const startX = centerX % gridSize;
+        for (let x = startX; x < width; x += gridSize) {
+          graphCtx.beginPath();
+          graphCtx.moveTo(x, 0);
+          graphCtx.lineTo(x, height);
+          graphCtx.stroke();
+        }
+
+        const startY = centerY % gridSize;
+        for (let y = startY; y < height; y += gridSize) {
+          graphCtx.beginPath();
+          graphCtx.moveTo(0, y);
+          graphCtx.lineTo(width, y);
+          graphCtx.stroke();
+        }
+
+        // Chalk Axes
+        graphCtx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+        graphCtx.lineWidth = 2.5;
+
+        graphCtx.beginPath();
+        graphCtx.moveTo(0, centerY);
+        graphCtx.lineTo(width, centerY);
+        graphCtx.stroke();
+
+        graphCtx.beginPath();
+        graphCtx.moveTo(centerX, 0);
+        graphCtx.lineTo(centerX, height);
+        graphCtx.stroke();
+
+        graphCtx.fillStyle = "rgba(255,255,255,0.6)";
+        graphCtx.font = "16px Caveat";
+        graphCtx.fillText("0", centerX + 6, centerY + 18);
+
+        // Integral Shading
+        const showIntegral =
+          document.getElementById("showIntegralCheck").checked;
+        const funcFStr = document.getElementById("funcInputF").value;
+        let compiledF = null;
+
+        try {
+          compiledF = math.compile(funcFStr);
+        } catch (e) {}
+
+        if (showIntegral && compiledF) {
+          const limitA =
+            parseFloat(document.getElementById("intLimitA").value) || -2;
+          const limitB =
+            parseFloat(document.getElementById("intLimitB").value) || 2;
+
+          graphCtx.fillStyle = "rgba(162, 242, 200, 0.22)";
+          graphCtx.beginPath();
+
+          let first = true;
+          const step = 2;
+          for (let px = 0; px <= width; px += step) {
+            const xVal = (px - centerX) / scale;
+            if (xVal >= limitA && xVal <= limitB) {
+              try {
+                const yVal = compiledF.evaluate({ x: xVal });
+                const py = centerY - yVal * scale;
+                if (first) {
+                  graphCtx.moveTo(px, centerY);
+                  graphCtx.lineTo(px, py);
+                  first = false;
+                } else {
+                  graphCtx.lineTo(px, py);
+                }
+              } catch (e) {}
+            }
+          }
+          const pxB = centerX + limitB * scale;
+          graphCtx.lineTo(pxB, centerY);
+          graphCtx.closePath();
+          graphCtx.fill();
+        }
+
+        // Plot f(x)
+        if (compiledF) {
+          drawChalkCurve(compiledF, "#fce893", 3);
+        }
+
+        // Plot g(x)
+        const funcGStr = document.getElementById("funcInputG").value;
+        if (funcGStr.trim()) {
+          try {
+            const compiledG = math.compile(funcGStr);
+            drawChalkCurve(compiledG, "#fca1d9", 2.5);
+          } catch (e) {}
+        }
+
+        // Plot f'(x)
+        if (document.getElementById("showDerivCheck").checked && funcFStr) {
+          try {
+            const derivStr = math.derivative(funcFStr, "x").toString();
+            const compiledDeriv = math.compile(derivStr);
+            drawChalkCurve(compiledDeriv, "#a3f0f7", 2.5, true);
+          } catch (e) {}
+        }
+      }
+
+      function drawChalkCurve(
+        compiledExpr,
+        color,
+        width = 2.5,
+        isDashed = false,
+      ) {
+        const w = graphCanvas.width;
+        const centerX = w / 2 + viewX * scale;
+        const centerY = graphCanvas.height / 2 - viewY * scale;
+
+        graphCtx.save();
+        graphCtx.strokeStyle = color;
+        graphCtx.lineWidth = width;
+        graphCtx.shadowColor = color;
+        graphCtx.shadowBlur = 5;
+
+        if (isDashed) {
+          graphCtx.setLineDash([7, 7]);
+        }
+
+        graphCtx.beginPath();
+        let isPlotting = false;
+
+        for (let px = 0; px <= w; px += 2) {
+          const xVal = (px - centerX) / scale;
+          try {
+            const yVal = compiledExpr.evaluate({ x: xVal });
+            if (typeof yVal === "number" && !isNaN(yVal) && isFinite(yVal)) {
+              const py = centerY - yVal * scale;
+              if (!isPlotting) {
+                graphCtx.moveTo(px, py);
+                isPlotting = true;
+              } else {
+                graphCtx.lineTo(px, py);
+              }
+            } else {
+              isPlotting = false;
+            }
+          } catch (e) {
+            isPlotting = false;
+          }
+        }
+        graphCtx.stroke();
+        graphCtx.restore();
+      }
+
+      function loadPreset(type) {
+        playChalkSound("click");
+        if (type === "sine") {
+          document.getElementById("funcInputF").value = "sin(x)";
+          document.getElementById("funcInputG").value = "cos(x)";
+        } else if (type === "cubic") {
+          document.getElementById("funcInputF").value = "x^3 - 3*x";
+          document.getElementById("funcInputG").value = "0.5*x";
+        } else if (type === "gauss") {
+          document.getElementById("funcInputF").value = "2 * e^(-(x^2))";
+          document.getElementById("funcInputG").value = "";
+        } else if (type === "damped") {
+          document.getElementById("funcInputF").value = "e^(-0.3*x) * sin(3*x)";
+          document.getElementById("funcInputG").value = "";
+        }
+        renderGraph();
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (currentTab !== "calc") return;
+        if (document.activeElement.tagName === "INPUT") return;
+
+        if (
+          (e.key >= "0" && e.key <= "9") ||
+          ["+", "-", "*", "/", ".", "(", ")"].includes(e.key)
+        ) {
+          appendToken(e.key);
+        } else if (e.key === "Enter") {
+          calculateResult();
+        } else if (e.key === "Backspace") {
+          deleteLast();
+        } else if (e.key === "Escape") {
+          triggerEraserClear();
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (currentTab === "graph") {
+          initGraphCanvas();
+        }
+      });
+    </script>
+  </body>
+</html>
