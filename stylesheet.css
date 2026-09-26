@@ -81,11 +81,9 @@ body {
   max-width: 980px;
   background: var(--slate-bg);
   border: 14px solid var(--wood-frame);
-  /* Asymmetrical organic border-radius for rough slate frame */
   box-shadow:
     inset 0 0 50px rgba(0, 0, 0, 0.85),
-    0 15px 35px rgba(0, 0, 0, 0.8),
-    0 0 0 2px rgba(255, 255, 255, 0.1);
+    0 15px 35px rgba(0, 0, 0, 0.8);
   padding: 22px;
   display: flex;
   flex-direction: column;
@@ -120,9 +118,7 @@ header {
   font-family: var(--font-heading);
   font-size: 2.2rem;
   color: var(--chalk-white);
-  text-shadow:
-    0 0 6px rgba(255, 255, 255, 0.6),
-    2px 2px 0px rgba(0, 0, 0, 0.9);
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.9);
   letter-spacing: 1.5px;
   display: flex;
   align-items: center;
@@ -156,7 +152,6 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
 }
 
 .tab-btn:nth-child(1) {
@@ -177,10 +172,7 @@ header {
   color: var(--chalk-yellow);
   border: 3px solid var(--chalk-yellow);
   background: rgba(253, 232, 147, 0.08);
-  box-shadow:
-    0 0 10px rgba(252, 232, 147, 0.2),
-    inset 0 0 10px rgba(0, 0, 0, 0.5);
-  text-shadow: 0 0 6px rgba(252, 232, 147, 0.5);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .top-utility-btn {
@@ -243,9 +235,7 @@ header {
   justify-content: space-between;
   align-items: flex-end;
   overflow: hidden;
-  box-shadow:
-    inset 0 4px 20px rgba(0, 0, 0, 0.9),
-    0 0 8px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.9);
   transform: rotate(-0.3deg);
 }
 
@@ -317,9 +307,7 @@ header {
   font-size: 3.1rem;
   font-weight: 700;
   color: var(--chalk-white);
-  text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.6),
-    2px 2px 3px rgba(0, 0, 0, 0.9);
+  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.9);
   min-height: 3.4rem;
   word-break: break-all;
   text-align: right;
@@ -336,7 +324,6 @@ header {
   align-self: flex-start;
   font-family: var(--font-chalk);
   font-weight: bold;
-  text-shadow: 0 0 4px rgba(252, 232, 147, 0.4);
 }
 
 /* Keypad Grid with Hand-Drawn Chalk Keys */
@@ -347,9 +334,6 @@ header {
   margin-top: 8px;
 }
 
-/* Numeric block: digits get their own bordered/tinted box so they read
-   as one clearly grouped unit, operators sit in a narrow strip beside
-   it instead of sharing columns with the digits */
 .numeric-block {
   display: flex;
   gap: 10px;
@@ -382,8 +366,6 @@ header {
   font-size: 1.7rem;
 }
 
-/* Calculus tools get their own full-width row so they read as a distinct
-   "toolbox" rather than being lost among the trig/number keys */
 .calc-tools {
   display: flex;
   gap: 10px;
@@ -403,7 +385,6 @@ header {
 .btn {
   background: rgba(255, 255, 255, 0.03);
   border: 2px solid rgba(255, 255, 255, 0.7);
-  /* Asymmetrical rough organic hand-drawn shapes */
   border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
   color: var(--chalk-white);
   font-family: var(--font-chalk);
@@ -416,15 +397,10 @@ header {
   align-items: center;
   justify-content: center;
   position: relative;
-  text-shadow:
-    0 0 5px rgba(255, 255, 255, 0.4),
-    1px 1px 2px rgba(0, 0, 0, 0.8);
-  box-shadow:
-    0 0 4px rgba(255, 255, 255, 0.2),
-    inset 0 0 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Asymmetrical micro-rotations for hand-drawn chalk look */
 .btn:nth-child(2n) {
   transform: rotate(-0.6deg);
 }
@@ -442,7 +418,7 @@ header {
   background: rgba(255, 255, 255, 0.14);
   border-color: var(--chalk-white);
   transform: scale(1.05) rotate(0deg) !important;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
   z-index: 5;
 }
 
@@ -486,7 +462,7 @@ header {
   color: var(--chalk-yellow);
   font-size: 1.8rem;
   font-weight: bold;
-  box-shadow: 0 0 10px rgba(252, 232, 147, 0.3);
+  box-shadow: none;
 }
 
 /* Hand-Drawn History Side Panel */
@@ -601,7 +577,7 @@ header {
 
 .chalk-input:focus {
   border-color: var(--chalk-yellow);
-  box-shadow: 0 0 8px rgba(252, 232, 147, 0.4);
+  box-shadow: none;
 }
 
 .checkbox-group {
@@ -680,11 +656,6 @@ header {
   pointer-events: none;
 }
 
-/* Keep every number/operator key upright and the same height. Placed at
-   the end of the sheet on purpose: the hand-drawn nth-child rotation
-   rules defined above (same specificity) would otherwise win the
-   cascade by appearing later, which is what made the numeric block look
-   uneven and scattered instead of like one tidy group. */
 .num-grid .btn,
 .op-grid .btn {
   height: 58px;

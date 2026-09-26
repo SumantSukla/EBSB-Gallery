@@ -47,7 +47,7 @@
     <div class="chalkboard-container">
       <!-- Header -->
       <header>
-        <div class="app-title">✏️ Chalkboard Physicist <span>v2.0</span></div>
+        <div class="app-title">✏️ Chalkboard Physicist</div>
 
         <!-- Navigation Tabs -->
         <div class="tab-controls">
@@ -171,20 +171,42 @@
                  unit, operators sit in a separate strip beside them -->
             <div class="numeric-block">
               <div class="num-grid">
-                <button class="btn btn-num" onclick="appendToken('7')">7</button>
-                <button class="btn btn-num" onclick="appendToken('8')">8</button>
-                <button class="btn btn-num" onclick="appendToken('9')">9</button>
+                <button class="btn btn-num" onclick="appendToken('7')">
+                  7
+                </button>
+                <button class="btn btn-num" onclick="appendToken('8')">
+                  8
+                </button>
+                <button class="btn btn-num" onclick="appendToken('9')">
+                  9
+                </button>
 
-                <button class="btn btn-num" onclick="appendToken('4')">4</button>
-                <button class="btn btn-num" onclick="appendToken('5')">5</button>
-                <button class="btn btn-num" onclick="appendToken('6')">6</button>
+                <button class="btn btn-num" onclick="appendToken('4')">
+                  4
+                </button>
+                <button class="btn btn-num" onclick="appendToken('5')">
+                  5
+                </button>
+                <button class="btn btn-num" onclick="appendToken('6')">
+                  6
+                </button>
 
-                <button class="btn btn-num" onclick="appendToken('1')">1</button>
-                <button class="btn btn-num" onclick="appendToken('2')">2</button>
-                <button class="btn btn-num" onclick="appendToken('3')">3</button>
+                <button class="btn btn-num" onclick="appendToken('1')">
+                  1
+                </button>
+                <button class="btn btn-num" onclick="appendToken('2')">
+                  2
+                </button>
+                <button class="btn btn-num" onclick="appendToken('3')">
+                  3
+                </button>
 
-                <button class="btn btn-num btn-zero" onclick="appendToken('0')">0</button>
-                <button class="btn btn-num" onclick="appendToken('.')">.</button>
+                <button class="btn btn-num btn-zero" onclick="appendToken('0')">
+                  0
+                </button>
+                <button class="btn btn-num" onclick="appendToken('.')">
+                  .
+                </button>
               </div>
               <div class="op-grid">
                 <button class="btn btn-op" onclick="appendToken('/')">÷</button>
@@ -193,7 +215,10 @@
                 <button class="btn btn-op" onclick="appendToken('+')">+</button>
               </div>
             </div>
-            <button class="btn btn-equals btn-equals-bar" onclick="calculateResult()">
+            <button
+              class="btn btn-equals btn-equals-bar"
+              onclick="calculateResult()"
+            >
               =
             </button>
           </div>
@@ -562,24 +587,17 @@
       }
 
       // Rewrites sin(/cos(/tan(/asin(/acos(/atan( calls for DEG mode.
-      // Walks the string tracking paren depth so it (a) never mistakes the
-      // "sin" inside "asin" for the plain sin() function, and (b) correctly
-      // matches the closing paren even when the argument itself contains
-      // nested parentheses, e.g. sin(2*(1+3)).
       function convertTrigForDegrees(str) {
         const fwd = ["sin", "cos", "tan"];
         const inv = ["asin", "acos", "atan"];
-        const all = [...inv, ...fwd]; // check longer names (asin) before short (sin)
+        const all = [...inv, ...fwd];
         let out = "";
         let i = 0;
         while (i < str.length) {
           let matchName = null;
           for (const name of all) {
             const prevChar = i > 0 ? str[i - 1] : "";
-            if (
-              str.startsWith(name + "(", i) &&
-              !/[A-Za-z]/.test(prevChar)
-            ) {
+            if (str.startsWith(name + "(", i) && !/[A-Za-z]/.test(prevChar)) {
               matchName = name;
               break;
             }
@@ -594,11 +612,11 @@
               j++;
             }
             const rawArg = str.slice(argStart, j - 1);
-            const arg = convertTrigForDegrees(rawArg); // handle nested calls
+            const arg = convertTrigForDegrees(rawArg);
             if (fwd.includes(matchName)) {
               out += `${matchName}((${arg})*deg)`;
             } else {
-              out += `(${matchName}(${arg})/deg)`; // convert radians result to degrees
+              out += `(${matchName}(${arg})/deg)`;
             }
             i = j;
           } else {
@@ -931,8 +949,7 @@
         graphCtx.save();
         graphCtx.strokeStyle = color;
         graphCtx.lineWidth = width;
-        graphCtx.shadowColor = color;
-        graphCtx.shadowBlur = 5;
+        graphCtx.shadowBlur = 0;
 
         if (isDashed) {
           graphCtx.setLineDash([7, 7]);
